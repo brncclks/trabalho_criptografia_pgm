@@ -10,16 +10,22 @@ int copy_pgm_header(FILE *in, FILE *out) {
     int line_count = 0;
  
     // O cabeçalho PGM "P2" possui 3 componentes numéricos (Largura, Altura, MaxVal).
-    while (line_count < 3 && fgets(buffer, sizeof(buffer), in)) {
+    while (fgets(buffer, sizeof(buffer), in)) {
         fputs(buffer, out);
         // Ignora linhas de comentários que começam com '#'
-        if (buffer[0] != '#') {
-            // Se encontrou espaço separando dimensões, conta como 2 valores
-            if (strchr(buffer, ' ') != NULL) line_count += 2;
-            else line_count++;
+         if (buffer[0] == '#' || buffer[0] == '\n' ||
+            buffer[0] == '\r') {
+            continue;
+        }
+
+        line_count++;
+
+        if (line_count == 3) {
+            return 1;
         }
     }
-    return 1;
+
+    return 0;
 }
 
 // Tarefa 1: Implementar o modo ECB (Blocos de 8 pixels)
@@ -46,8 +52,9 @@ void process_ecb(const char *input_filename, const char *output_filename, unsign
 
         // Quando o bloco enche, processamos e escrevemos
         if (count == BLOCK_SIZE) { 
-            // TODO (Aluno): Fazer o XOR do pixel_block com a key
-            // Dica: for(int i=0; i<BLOCK_SIZE; i++) { ... }
+            for (int i = 0; i < BLOCK_SIZE; i++) {
+            pixel_block[i] = pixel_block[i] ^ key[i];
+        }
 
             for (int i = 0; i < BLOCK_SIZE; i++) {
                 fprintf(out, "%d\n", pixel_block[i]);
@@ -60,7 +67,10 @@ void process_ecb(const char *input_filename, const char *output_filename, unsign
     // Se o arquivo terminar e 'count' for maior que 0, significa que 
     // sobraram alguns pixels que não formaram um bloco inteiro.
     if (count > 0) {
-        /* INSIRA A LÓGICA DO ÚLTIMO BLOCO AQUI */
+        for (int i = 0; i < count; i++) {
+            pixel_block[i] = pixel_block[i] ^ key[i];
+            fprintf(out, "%d\n", pixel_block[i]);
+        }
     }
 
     fclose(in);
@@ -88,12 +98,10 @@ void process_stream(const char *input_filename, const char *output_filename, uns
     while (fscanf(in, "%d", &pixel_val) == 1) {
  
         // TODO (Aluno): Gerar um keystream e aplicar XOR
-        /*
-        * INSIRA SUA LÓGICA AQUI:
-        * int keystream = rand() % 256;
-        * int encrypted_val = pixel_val ^ keystream;
-        * fprintf(out, "%d\n", encrypted_val);
-        */
+        int keystream = rand() % 256;
+        int encrypted_val = pixel_val ^ keystream;
+        fprintf(out, "%d\n", encrypted_val);
+        //
     }
 
     fclose(in);
