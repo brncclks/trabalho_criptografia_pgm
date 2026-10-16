@@ -2,7 +2,7 @@
 
 1. Objetivo
    
-  Implementar e analisar duas técnicas didáticas de criptografia aplicadas a imagens em tons de cinza no formato PGM ASCII(P2).
+     Implementar e analisar duas técnicas didáticas de criptografia aplicadas a imagens em tons de cinza no formato PGM ASCII(P2).
 
 2. Técnicas implementadas
    
